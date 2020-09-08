@@ -1,16 +1,20 @@
 import React from 'react';
-import Config from 'react-native-config';
-import { View, Text } from 'react-native';
+import store from '@store';
+import { Provider } from 'react-redux';
+import { StatusBar } from 'react-native';
 
-import { appStyles } from './style';
+import Navigator from '@navigator';
 
 const App = () => {
-  const { container } = appStyles;
-
   return (
-    <View style={container}>
-      <Text>{Config.API_URL}</Text>
-    </View>
+    <Provider store={store}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <Navigator />
+    </Provider>
   );
 };
 
