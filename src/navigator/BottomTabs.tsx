@@ -45,7 +45,7 @@ interface BottomTabsProps {
 }
 
 const BottomTabs: FC<BottomTabsProps> = (props) => {
-  const setOptions = () => {
+  const setOptions = (): void => {
     const { navigation, route } = props;
     const routeName = route.state
       ? route.state.routes[route.state.index].name

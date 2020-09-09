@@ -1,21 +1,37 @@
-import React, { FC } from 'react';
-import { View, Text, Button } from 'react-native';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { FC, useEffect } from 'react';
+import { View } from 'react-native';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootStackNavigation } from '@navigator';
+import { RootState } from '@store/models';
+
+import Carousel from '@pages/Home/components/Carousel';
+import Guess from '@pages/Home/components/Guess';
 
 interface HomeProps {
   navigation: RootStackNavigation;
 }
 
 const Home: FC<HomeProps> = (props) => {
-  const handleBtnClick = () => {
-    const { navigation } = props;
-    navigation.navigate('Detail', { id: 100 });
-  };
+  const { guesses, carousels } = useSelector(
+    (state: RootState) => state.homeModel,
+    shallowEqual,
+  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch({
+      type: 'homeModel/fetchCarousels',
+    });
+    dispatch({
+      type: 'homeModel/fetchGuesses',
+    });
+  }, []);
 
   return (
     <View>
-      <Text>Home</Text>
-      <Button title="点击跳转详情页" onPress={handleBtnClick} />
+      <Carousel carousels={carousels} />
+      <Guess guesses={guesses} />
     </View>
   );
 };

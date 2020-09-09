@@ -12,15 +12,24 @@
     "target": "esnext",
     "baseUrl": ".",
     "paths": {
-      "@@": ["./"],
-      "@": ["./src"],
-      "@assets": ["./src/assets"],
-      "@components": ["./src/components"],
-      "@config": ["./src/config"],
-      "@navigator": ["./src/navigator"],
-      "@pages": ["./src/pages"],
-      "@store": ["./src/store"],
-      "@utils": ["./src/utils"]
+      "@@": [""],
+      "@": ["src"],
+      "@assets": ["src/assets"],
+      "@components": ["src/components"],
+      "@config": ["src/config"],
+      "@navigator": ["src/navigator"],
+      "@pages": ["src/pages"],
+      "@store": ["src/store"],
+      "@utils": ["src/utils"],
+      "@@/*": ["*"],
+      "@/*": ["src/*"],
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/components/*"],
+      "@config/*": ["src/config/*"],
+      "@navigator/*": ["src/navigator/*"],
+      "@pages/*": ["src/pages/*"],
+      "@store/*": ["src/store/*"],
+      "@utils/*": ["src/utils/*"]
     }
   },
   "exclude": [
