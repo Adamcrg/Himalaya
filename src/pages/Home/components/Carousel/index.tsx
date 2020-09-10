@@ -1,5 +1,5 @@
-import React, { FC, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { FC, memo, useState } from 'react';
+import { StyleSheet, View, ListRenderItemInfo } from 'react-native';
 import SnapCarousel, {
   ParallaxImage,
   Pagination,
@@ -22,7 +22,7 @@ const Carousel: FC<CarouselProps> = (props) => {
   const { carousels } = props;
 
   const renderItem = (
-    itemObj: { item: CarouselItem; index: number },
+    itemObj: ListRenderItemInfo<CarouselItem>,
     parallaxProps?: AdditionalParallaxProps,
   ): JSX.Element => {
     const { item } = itemObj;
@@ -41,7 +41,7 @@ const Carousel: FC<CarouselProps> = (props) => {
     );
   };
 
-  const onSnapToItem = (index: number): void => {
+  const handleSnapToItem = (index: number): void => {
     setActiveSlide(index);
   };
 
@@ -71,7 +71,7 @@ const Carousel: FC<CarouselProps> = (props) => {
         sliderWidth={sliderWidth}
         itemWidth={imageWidth}
         renderItem={renderItem}
-        onSnapToItem={onSnapToItem}
+        onSnapToItem={handleSnapToItem}
       />
       {pagination()}
     </View>
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Carousel;
+export default memo(Carousel);

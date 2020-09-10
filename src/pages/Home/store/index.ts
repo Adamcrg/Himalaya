@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { Reducer } from 'redux';
 import { Model, Effect } from 'dva-core-ts';
+import { RootState } from '@store/models';
 
 const CAROUSEL_URL = '/mock/11/Himalaya/carousel';
 const GUESS_URL = '/mock/11/Himalaya/guess';
+const CHANNEL_URL = '/mock/11/Himalaya/channel';
 
 export interface CarouselItem {
   id: string;
@@ -17,9 +19,19 @@ export interface GuessItem {
   image: string;
 }
 
+export interface ChannelItem {
+  id: string;
+  title: string;
+  image: string;
+  remark: string;
+  played: number;
+  playing: number;
+}
+
 export interface HomeState {
   carousels: CarouselItem[];
   guesses: GuessItem[];
+  channels: ChannelItem[];
 }
 
 interface HomeModel extends Model {
@@ -31,12 +43,14 @@ interface HomeModel extends Model {
   effects: {
     fetchCarousels: Effect;
     fetchGuesses: Effect;
+    fetchChannels: Effect;
   };
 }
 
 const initialState: HomeState = {
   carousels: [],
   guesses: [],
+  channels: [],
 };
 
 const homeModel: HomeModel = {
@@ -53,7 +67,6 @@ const homeModel: HomeModel = {
   effects: {
     *fetchCarousels(_, { call, put }) {
       const { data } = yield call(axios.get, CAROUSEL_URL);
-      console.log('---轮播图---', data);
       yield put({
         type: 'setState',
         payload: {
@@ -63,13 +76,29 @@ const homeModel: HomeModel = {
     },
     *fetchGuesses(_, { call, put }) {
       const { data } = yield call(axios.get, GUESS_URL);
-      console.log('---猜你喜欢---', data);
       yield put({
         type: 'setState',
         payload: {
           guesses: data,
         },
       });
+    },
+    *fetchChannels(_, { call, put, select }) {
+      const { channels } = yield select((state: RootState) => state.homeModel);
+      const { callback, payload } = _;
+      const { data } = yield call(axios.get, CHANNEL_URL);
+      if (payload && payload.loadMore) {
+        data.results = [...channels, ...data.results];
+      }
+      yield put({
+        type: 'setState',
+        payload: {
+          channels: data.results,
+        },
+      });
+      if (typeof callback === 'function') {
+        callback();
+      }
     },
   },
 };

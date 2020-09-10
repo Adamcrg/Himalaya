@@ -1,5 +1,14 @@
-import React, { FC } from 'react';
-import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
+import React, { FC, memo, useRef } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  Animated,
+  StyleSheet,
+  ListRenderItemInfo,
+} from 'react-native';
+import { useDispatch } from 'react-redux';
 import { GuessItem } from '@pages/Home/store';
 
 import Touchable from '@components/Touchable';
@@ -13,10 +22,11 @@ interface GuessProps {
 const Guess: FC<GuessProps> = (props) => {
   const { guesses } = props;
 
-  const renderItem = (itemObj: {
-    item: GuessItem;
-    index: number;
-  }): JSX.Element => {
+  const dispatch = useDispatch();
+
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  const renderItem = (itemObj: ListRenderItemInfo<GuessItem>): JSX.Element => {
     const { item } = itemObj;
 
     return (
@@ -25,6 +35,21 @@ const Guess: FC<GuessProps> = (props) => {
         <Text numberOfLines={2}>{item.title}</Text>
       </Touchable>
     );
+  };
+
+  const keyExtractor = (item: GuessItem): string => {
+    return item.id;
+  };
+
+  const handleSwitch = (): void => {
+    Animated.timing(rotateAnim, {
+      toValue: 100,
+      duration: 150,
+      useNativeDriver: true,
+    }).start();
+    dispatch({
+      type: 'homeModel/fetchGuesses',
+    });
   };
 
   return (
@@ -39,10 +64,29 @@ const Guess: FC<GuessProps> = (props) => {
           <Icon name="iconarrow-right" />
         </View>
       </View>
-      <FlatList numColumns={3} data={guesses} renderItem={renderItem} />
-      <Touchable style={styles.footer}>
-        <Icon name="iconexchangerate" />
-        <Text>换一批</Text>
+      <FlatList
+        style={styles.listContainer}
+        numColumns={3}
+        data={guesses}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+      />
+      <Touchable style={styles.footer} onPress={handleSwitch}>
+        <Animated.View
+          style={{
+            transform: [
+              {
+                rotate: rotateAnim.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: ['0deg', '180deg'],
+                }),
+              },
+            ],
+          }}
+        >
+          <Icon name="iconexchangerate" color="#f86442" />
+        </Animated.View>
+        <Text style={styles.footerText}>换一批</Text>
       </Touchable>
     </View>
   );
@@ -79,10 +123,17 @@ const styles = StyleSheet.create({
   headerRightText: {
     color: '#6f6f6f',
   },
+  listContainer: {
+    padding: 10,
+  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 10,
+  },
+  footerText: {
+    marginLeft: 5,
   },
   itemContainer: {
     flex: 1,
@@ -97,4 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Guess;
+export default memo(Guess);

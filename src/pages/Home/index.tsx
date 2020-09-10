@@ -4,20 +4,35 @@ import { View } from 'react-native';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootStackNavigation } from '@navigator';
 import { RootState } from '@store/models';
+import { ChannelItem } from '@pages/Home/store';
 
 import Carousel from '@pages/Home/components/Carousel';
 import Guess from '@pages/Home/components/Guess';
+import Channel from '@pages/Home/components/Channel';
 
 interface HomeProps {
   navigation: RootStackNavigation;
 }
 
 const Home: FC<HomeProps> = (props) => {
-  const { guesses, carousels } = useSelector(
+  const { carousels, guesses, channels } = useSelector(
     (state: RootState) => state.homeModel,
     shallowEqual,
   );
   const dispatch = useDispatch();
+
+  const ListHeaderComponent: FC = () => {
+    return (
+      <View>
+        <Carousel carousels={carousels} />
+        <Guess guesses={guesses} />
+      </View>
+    );
+  };
+
+  const handleChannelPress = (channel: ChannelItem): void => {
+    alert(channel.title);
+  };
 
   useEffect(() => {
     dispatch({
@@ -26,13 +41,17 @@ const Home: FC<HomeProps> = (props) => {
     dispatch({
       type: 'homeModel/fetchGuesses',
     });
+    dispatch({
+      type: 'homeModel/fetchChannels',
+    });
   }, []);
 
   return (
-    <View>
-      <Carousel carousels={carousels} />
-      <Guess guesses={guesses} />
-    </View>
+    <Channel
+      channels={channels}
+      ListHeaderComponent={ListHeaderComponent}
+      onPress={handleChannelPress}
+    />
   );
 };
 
