@@ -1,20 +1,7 @@
-import { create, Model } from 'dva-core-ts';
-import createLoading from 'dva-loading-ts';
-import models from '@store/models';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import reducer from '@store/reducer';
 
-// 创建实例
-const app = create();
-
-models.forEach((model: Model) => {
-  app.model(model);
-});
-
-app.use(createLoading());
-
-// 启动
-app.start();
-
-// 导出
-const store = app._store;
+const store = createStore(reducer, applyMiddleware(thunk));
 
 export default store;

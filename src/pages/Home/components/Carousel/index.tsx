@@ -6,7 +6,7 @@ import SnapCarousel, {
   AdditionalParallaxProps,
 } from 'react-native-snap-carousel';
 import { viewportWidth, widthPercent, heightPercent } from '@utils';
-import { CarouselItem } from '@pages/Home/store';
+import { CarouselItem } from '@pages/Home/store/reducer';
 
 const sliderWidth = viewportWidth;
 const imageWidth = widthPercent(90) + widthPercent(2) * 2;

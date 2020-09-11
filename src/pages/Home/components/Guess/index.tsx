@@ -9,7 +9,8 @@ import {
   ListRenderItemInfo,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { GuessItem } from '@pages/Home/store';
+import { actions } from '@pages/Home/store';
+import { GuessItem } from '@pages/Home/store/reducer';
 
 import Touchable from '@components/Touchable';
 
@@ -47,9 +48,7 @@ const Guess: FC<GuessProps> = (props) => {
       duration: 150,
       useNativeDriver: true,
     }).start();
-    dispatch({
-      type: 'homeModel/fetchGuesses',
-    });
+    dispatch(actions.getGuesses());
   };
 
   return (

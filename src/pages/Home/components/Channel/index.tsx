@@ -8,7 +8,8 @@ import {
   ListRenderItemInfo,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { ChannelItem } from '@pages/Home/store';
+import { actions } from '@pages/Home/store';
+import { ChannelItem } from '@pages/Home/store/reducer';
 
 import Touchable from '@components/Touchable';
 
@@ -75,21 +76,12 @@ const Channel: FC<ChannelProps> = (props) => {
 
   const handleRefresh = (): void => {
     setRefreshing(true);
-    dispatch({
-      type: 'homeModel/fetchChannels',
-      callback: () => {
-        setRefreshing(false);
-      },
-    });
+    dispatch(actions.getChannels({}));
+    setRefreshing(false);
   };
 
   const handleEndReached = (): void => {
-    dispatch({
-      type: 'homeModel/fetchChannels',
-      payload: {
-        loadMore: true,
-      },
-    });
+    dispatch(actions.getChannels({ loadMore: true }));
   };
 
   return (

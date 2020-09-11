@@ -16,8 +16,7 @@
     "@react-navigation/native": "^5.7.3",
     "@react-navigation/stack": "^5.9.0",
     "axios": "^0.20.0",
-    "dva-core-ts": "^2.0.7",
-    "dva-loading-ts": "^3.0.20",
+    "immer": "^7.0.9",
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-gesture-handler": "^1.7.0",
@@ -27,7 +26,8 @@
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^12.1.0",
     "react-native-tab-view": "^2.15.1",
-    "react-redux": "^7.2.1"
+    "react-redux": "^7.2.1",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

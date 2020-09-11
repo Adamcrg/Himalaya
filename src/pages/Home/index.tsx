@@ -3,8 +3,9 @@ import React, { FC, useEffect } from 'react';
 import { View } from 'react-native';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootStackNavigation } from '@navigator';
-import { RootState } from '@store/models';
-import { ChannelItem } from '@pages/Home/store';
+import { RootState } from '@store/reducer';
+import { actions } from '@pages/Home/store';
+import { ChannelItem } from '@pages/Home/store/reducer';
 
 import Carousel from '@pages/Home/components/Carousel';
 import Guess from '@pages/Home/components/Guess';
@@ -16,7 +17,7 @@ interface HomeProps {
 
 const Home: FC<HomeProps> = (props) => {
   const { carousels, guesses, channels } = useSelector(
-    (state: RootState) => state.homeModel,
+    (state: RootState) => state.home,
     shallowEqual,
   );
   const dispatch = useDispatch();
@@ -35,15 +36,9 @@ const Home: FC<HomeProps> = (props) => {
   };
 
   useEffect(() => {
-    dispatch({
-      type: 'homeModel/fetchCarousels',
-    });
-    dispatch({
-      type: 'homeModel/fetchGuesses',
-    });
-    dispatch({
-      type: 'homeModel/fetchChannels',
-    });
+    dispatch(actions.getCarousels());
+    dispatch(actions.getGuesses());
+    dispatch(actions.getChannels({}));
   }, []);
 
   return (
