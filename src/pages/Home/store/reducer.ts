@@ -23,16 +23,30 @@ export interface ChannelItem {
   playing: number;
 }
 
+export interface Pagination {
+  current: number;
+  total: number;
+  hasMore: boolean;
+}
+
 export interface HomeState {
   carousels: CarouselItem[];
   guesses: GuessItem[];
   channels: ChannelItem[];
+  pagination: Pagination;
+  channelsLoading: boolean;
 }
 
 const initialState: HomeState = {
   carousels: [],
   guesses: [],
   channels: [],
+  pagination: {
+    current: 1,
+    total: 0,
+    hasMore: true,
+  },
+  channelsLoading: false,
 };
 
 export default produce(
@@ -51,8 +65,20 @@ export default produce(
       }
 
       case constants.GET_CHANNELS: {
-        const { channels } = action.payload as { channels: ChannelItem[] };
+        const { channels, pagination } = action.payload as {
+          channels: ChannelItem[];
+          pagination: Pagination;
+        };
         draftState.channels = channels;
+        draftState.pagination = pagination;
+        return draftState;
+      }
+
+      case constants.CHANGE_CHANNELS_LOADING: {
+        const { loading } = action.payload as {
+          loading: boolean;
+        };
+        draftState.channelsLoading = loading;
         return draftState;
       }
 

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { FC, useEffect } from 'react';
-import { View } from 'react-native';
+import React, { FC, memo, useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootStackNavigation } from '@navigator';
 import { RootState } from '@store/reducer';
@@ -44,10 +44,10 @@ const Home: FC<HomeProps> = (props) => {
   return (
     <Channel
       channels={channels}
-      ListHeaderComponent={ListHeaderComponent}
+      ListHeaderComponent={memo(ListHeaderComponent)}
       onPress={handleChannelPress}
     />
   );
 };
 
-export default Home;
+export default memo(Home);

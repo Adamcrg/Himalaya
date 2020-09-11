@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ListRenderItemInfo,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@store/reducer';
 import { actions } from '@pages/Home/store';
 import { ChannelItem } from '@pages/Home/store/reducer';
 
@@ -25,6 +26,10 @@ const Channel: FC<ChannelProps> = (props) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const { channels, ListHeaderComponent, onPress } = props;
+
+  const { pagination, channelsLoading } = useSelector(
+    (state: RootState) => state.home,
+  );
 
   const dispatch = useDispatch();
 
@@ -81,13 +86,39 @@ const Channel: FC<ChannelProps> = (props) => {
   };
 
   const handleEndReached = (): void => {
+    if (channelsLoading || !pagination.hasMore) {
+      return;
+    }
     dispatch(actions.getChannels({ loadMore: true }));
+  };
+
+  const ListFooterComponent: FC = () => {
+    const { hasMore } = pagination;
+
+    if (!hasMore) {
+      return (
+        <View style={styles.footer}>
+          <Text>---我是有底线的---</Text>
+        </View>
+      );
+    }
+
+    if (channelsLoading && hasMore && channels.length > 0) {
+      return (
+        <View style={styles.footer}>
+          <Text>---正在加载中...---</Text>
+        </View>
+      );
+    }
+
+    return <View />;
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        ListHeaderComponent={memo(ListHeaderComponent)}
+        ListHeaderComponent={ListHeaderComponent}
+        ListFooterComponent={ListFooterComponent}
         data={channels}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
@@ -140,6 +171,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 20,
+  },
+  footer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
   },
 });
 
