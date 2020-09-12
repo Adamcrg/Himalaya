@@ -8,7 +8,8 @@ import {
   StyleSheet,
   ListRenderItemInfo,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { RootState } from '@store/reducer';
 import { actions } from '@pages/Home/store';
 import { GuessItem } from '@pages/Home/store/reducer';
 
@@ -16,12 +17,13 @@ import Touchable from '@components/Touchable';
 
 import Icon from '@assets/iconfont';
 
-interface GuessProps {
-  guesses: GuessItem[];
-}
+interface GuessProps {}
 
 const Guess: FC<GuessProps> = (props) => {
-  const { guesses } = props;
+  const { guesses } = useSelector(
+    (state: RootState) => state.home,
+    shallowEqual,
+  );
 
   const dispatch = useDispatch();
 
@@ -47,7 +49,9 @@ const Guess: FC<GuessProps> = (props) => {
       toValue: 100,
       duration: 150,
       useNativeDriver: true,
-    }).start();
+    }).start(() => {
+      rotateAnim.setValue(0);
+    });
     dispatch(actions.getGuesses());
   };
 

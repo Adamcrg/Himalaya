@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ListRenderItemInfo,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootState } from '@store/reducer';
 import { actions } from '@pages/Home/store';
 import { ChannelItem } from '@pages/Home/store/reducer';
@@ -17,18 +17,19 @@ import Touchable from '@components/Touchable';
 import Icon from '@assets/iconfont';
 
 interface ChannelProps {
-  channels: ChannelItem[];
   ListHeaderComponent: FC;
+  ListFooterComponent: FC;
   onPress: (channel: ChannelItem) => void;
 }
 
 const Channel: FC<ChannelProps> = (props) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  const { channels, ListHeaderComponent, onPress } = props;
+  const { ListHeaderComponent, ListFooterComponent, onPress } = props;
 
-  const { pagination, channelsLoading } = useSelector(
+  const { channels, pagination, channelsLoading } = useSelector(
     (state: RootState) => state.home,
+    shallowEqual,
   );
 
   const dispatch = useDispatch();
@@ -81,8 +82,13 @@ const Channel: FC<ChannelProps> = (props) => {
 
   const handleRefresh = (): void => {
     setRefreshing(true);
-    dispatch(actions.getChannels({}));
-    setRefreshing(false);
+    dispatch(
+      actions.getChannels({
+        callback: () => {
+          setRefreshing(false);
+        },
+      }),
+    );
   };
 
   const handleEndReached = (): void => {
@@ -90,28 +96,6 @@ const Channel: FC<ChannelProps> = (props) => {
       return;
     }
     dispatch(actions.getChannels({ loadMore: true }));
-  };
-
-  const ListFooterComponent: FC = () => {
-    const { hasMore } = pagination;
-
-    if (!hasMore) {
-      return (
-        <View style={styles.footer}>
-          <Text>---我是有底线的---</Text>
-        </View>
-      );
-    }
-
-    if (channelsLoading && hasMore && channels.length > 0) {
-      return (
-        <View style={styles.footer}>
-          <Text>---正在加载中...---</Text>
-        </View>
-      );
-    }
-
-    return <View />;
   };
 
   return (
@@ -171,11 +155,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 20,
-  },
-  footer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 10,
   },
 });
 

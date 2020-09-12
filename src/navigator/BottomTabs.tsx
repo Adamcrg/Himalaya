@@ -45,6 +45,10 @@ interface BottomTabsProps {
 }
 
 const BottomTabs: FC<BottomTabsProps> = (props) => {
+  useEffect(() => {
+    setOptions();
+  });
+
   const setOptions = (): void => {
     const { navigation, route } = props;
     const routeName = route.state
@@ -55,10 +59,6 @@ const BottomTabs: FC<BottomTabsProps> = (props) => {
       headerTitle: getHeaderTitle(routeName),
     });
   };
-
-  useEffect(() => {
-    setOptions();
-  });
 
   return (
     <Tabs.Navigator

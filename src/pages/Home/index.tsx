@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { FC, memo, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
@@ -11,25 +10,48 @@ import Carousel from '@pages/Home/components/Carousel';
 import Guess from '@pages/Home/components/Guess';
 import Channel from '@pages/Home/components/Channel';
 
+const ListHeaderComponent: FC = () => {
+  return (
+    <View>
+      <Carousel />
+      <Guess />
+    </View>
+  );
+};
+
+const ListFooterComponent: FC = () => {
+  const { channels, pagination, channelsLoading } = useSelector(
+    (state: RootState) => state.home,
+    shallowEqual,
+  );
+
+  const { hasMore } = pagination;
+
+  if (!hasMore) {
+    return (
+      <View style={styles.footer}>
+        <Text>---我是有底线的---</Text>
+      </View>
+    );
+  }
+
+  if (channelsLoading && hasMore && channels.length > 0) {
+    return (
+      <View style={styles.footer}>
+        <Text>---正在加载中...---</Text>
+      </View>
+    );
+  }
+
+  return <View />;
+};
+
 interface HomeProps {
   navigation: RootStackNavigation;
 }
 
 const Home: FC<HomeProps> = (props) => {
-  const { carousels, guesses, channels } = useSelector(
-    (state: RootState) => state.home,
-    shallowEqual,
-  );
   const dispatch = useDispatch();
-
-  const ListHeaderComponent: FC = () => {
-    return (
-      <View>
-        <Carousel carousels={carousels} />
-        <Guess guesses={guesses} />
-      </View>
-    );
-  };
 
   const handleChannelPress = (channel: ChannelItem): void => {
     alert(channel.title);
@@ -39,15 +61,23 @@ const Home: FC<HomeProps> = (props) => {
     dispatch(actions.getCarousels());
     dispatch(actions.getGuesses());
     dispatch(actions.getChannels({}));
-  }, []);
+  }, [dispatch]);
 
   return (
     <Channel
-      channels={channels}
       ListHeaderComponent={memo(ListHeaderComponent)}
+      ListFooterComponent={memo(ListFooterComponent)}
       onPress={handleChannelPress}
     />
   );
 };
+
+const styles = StyleSheet.create({
+  footer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+});
 
 export default memo(Home);

@@ -82,7 +82,13 @@ export const getGuesses = () => {
   };
 };
 
-export const getChannels = ({ loadMore }: { loadMore?: boolean }) => {
+export const getChannels = ({
+  loadMore,
+  callback,
+}: {
+  loadMore?: boolean;
+  callback?: () => void;
+}) => {
   return async (dispatch, getState) => {
     try {
       dispatch(changeChannelsLoading(true));
@@ -105,6 +111,7 @@ export const getChannels = ({ loadMore }: { loadMore?: boolean }) => {
           hasMore: data.results.length < data.pagination.total,
         }),
       );
+      callback && callback();
       dispatch(changeChannelsLoading(false));
     } catch (error) {
       console.log(error);

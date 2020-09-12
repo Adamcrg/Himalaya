@@ -5,21 +5,24 @@ import SnapCarousel, {
   Pagination,
   AdditionalParallaxProps,
 } from 'react-native-snap-carousel';
+import { useSelector, shallowEqual } from 'react-redux';
 import { viewportWidth, widthPercent, heightPercent } from '@utils';
+import { RootState } from '@store/reducer';
 import { CarouselItem } from '@pages/Home/store/reducer';
 
 const sliderWidth = viewportWidth;
 const imageWidth = widthPercent(90) + widthPercent(2) * 2;
 const imageHeight = heightPercent(26);
 
-interface CarouselProps {
-  carousels: CarouselItem[];
-}
+interface CarouselProps {}
 
 const Carousel: FC<CarouselProps> = (props) => {
   const [activeSlide, setActiveSlide] = useState<number>(0);
 
-  const { carousels } = props;
+  const { carousels } = useSelector(
+    (state: RootState) => state.home,
+    shallowEqual,
+  );
 
   const renderItem = (
     itemObj: ListRenderItemInfo<CarouselItem>,
