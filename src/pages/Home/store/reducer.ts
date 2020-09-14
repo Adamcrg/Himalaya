@@ -31,14 +31,17 @@ export interface Pagination {
 
 export interface HomeState {
   carousels: CarouselItem[];
+  activeCarouselIndex: number;
   guesses: GuessItem[];
   channels: ChannelItem[];
   pagination: Pagination;
   channelsLoading: boolean;
+  linearGradientVisible: boolean;
 }
 
 const initialState: HomeState = {
   carousels: [],
+  activeCarouselIndex: 0,
   guesses: [],
   channels: [],
   pagination: {
@@ -47,6 +50,7 @@ const initialState: HomeState = {
     hasMore: true,
   },
   channelsLoading: false,
+  linearGradientVisible: true,
 };
 
 export default produce(
@@ -55,6 +59,14 @@ export default produce(
       case constants.GET_CAROUSELS: {
         const { carousels } = action.payload as { carousels: CarouselItem[] };
         draftState.carousels = carousels;
+        return draftState;
+      }
+
+      case constants.CHANGE_ACTIVE_CAROUSEL_INDEX: {
+        const { index } = action.payload as {
+          index: number;
+        };
+        draftState.activeCarouselIndex = index;
         return draftState;
       }
 
@@ -79,6 +91,13 @@ export default produce(
           loading: boolean;
         };
         draftState.channelsLoading = loading;
+        return draftState;
+      }
+      case constants.CHANGE_LINEAR_GRADIENT_VISIBLE: {
+        const { linearGradientVisible } = action.payload as {
+          linearGradientVisible: boolean;
+        };
+        draftState.linearGradientVisible = linearGradientVisible;
         return draftState;
       }
 

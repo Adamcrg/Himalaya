@@ -54,14 +54,24 @@ const BottomTabs: FC<BottomTabsProps> = (props) => {
     const routeName = route.state
       ? route.state.routes[route.state.index].name
       : route.params?.screen || 'HomeTabs';
-    navigation.setOptions({
-      headerTransparent: false,
-      headerTitle: getHeaderTitle(routeName),
-    });
+
+    if (routeName === 'HomeTabs') {
+      navigation.setOptions({
+        headerTransparent: true,
+        headerTitle: '',
+      });
+    } else {
+      navigation.setOptions({
+        headerTransparent: false,
+        headerTitle: getHeaderTitle(routeName),
+      });
+    }
   };
 
   return (
     <Tabs.Navigator
+      // 懒加载
+      lazy
       tabBarOptions={{
         activeTintColor: '#f86442',
       }}

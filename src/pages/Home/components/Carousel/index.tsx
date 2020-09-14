@@ -1,28 +1,29 @@
-import React, { FC, memo, useState } from 'react';
-import { StyleSheet, View, ListRenderItemInfo } from 'react-native';
+import React, { FC, memo } from 'react';
+import { View, StyleSheet, ListRenderItemInfo } from 'react-native';
 import SnapCarousel, {
   ParallaxImage,
   Pagination,
   AdditionalParallaxProps,
 } from 'react-native-snap-carousel';
-import { useSelector, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { viewportWidth, widthPercent, heightPercent } from '@utils';
 import { RootState } from '@store/reducer';
+import { actions } from '@pages/Home/store';
 import { CarouselItem } from '@pages/Home/store/reducer';
 
-const sliderWidth = viewportWidth;
-const imageWidth = widthPercent(90) + widthPercent(2) * 2;
-const imageHeight = heightPercent(26);
+export const sliderWidth = viewportWidth;
+export const imageWidth = widthPercent(90) + widthPercent(2) * 2;
+export const imageHeight = heightPercent(26);
 
 interface CarouselProps {}
 
 const Carousel: FC<CarouselProps> = (props) => {
-  const [activeSlide, setActiveSlide] = useState<number>(0);
-
-  const { carousels } = useSelector(
+  const { carousels, activeCarouselIndex } = useSelector(
     (state: RootState) => state.home,
     shallowEqual,
   );
+
+  const dispatch = useDispatch();
 
   const renderItem = (
     itemObj: ListRenderItemInfo<CarouselItem>,
@@ -45,7 +46,7 @@ const Carousel: FC<CarouselProps> = (props) => {
   };
 
   const handleSnapToItem = (index: number): void => {
-    setActiveSlide(index);
+    dispatch(actions.changeActiveCarouselIndex({ index }));
   };
 
   const pagination = (): JSX.Element => {
@@ -55,7 +56,7 @@ const Carousel: FC<CarouselProps> = (props) => {
           containerStyle={styles.paginationContainer}
           dotContainerStyle={styles.dotsContainer}
           dotStyle={styles.dots}
-          activeDotIndex={activeSlide}
+          activeDotIndex={activeCarouselIndex}
           dotsLength={carousels.length}
           inactiveDotScale={0.7}
           inactiveDotOpacity={0.4}

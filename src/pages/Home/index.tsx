@@ -4,7 +4,6 @@ import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootStackNavigation } from '@navigator';
 import { RootState } from '@store/reducer';
 import { actions } from '@pages/Home/store';
-import { ChannelItem } from '@pages/Home/store/reducer';
 
 import Carousel from '@pages/Home/components/Carousel';
 import Guess from '@pages/Home/components/Guess';
@@ -30,7 +29,7 @@ const ListFooterComponent: FC = () => {
   if (!hasMore) {
     return (
       <View style={styles.footer}>
-        <Text>---我是有底线的---</Text>
+        <Text>--- 我是有底线的 ---</Text>
       </View>
     );
   }
@@ -38,7 +37,7 @@ const ListFooterComponent: FC = () => {
   if (channelsLoading && hasMore && channels.length > 0) {
     return (
       <View style={styles.footer}>
-        <Text>---正在加载中...---</Text>
+        <Text>正在加载中...</Text>
       </View>
     );
   }
@@ -53,10 +52,6 @@ interface HomeProps {
 const Home: FC<HomeProps> = (props) => {
   const dispatch = useDispatch();
 
-  const handleChannelPress = (channel: ChannelItem): void => {
-    alert(channel.title);
-  };
-
   useEffect(() => {
     dispatch(actions.getCarousels());
     dispatch(actions.getGuesses());
@@ -67,7 +62,6 @@ const Home: FC<HomeProps> = (props) => {
     <Channel
       ListHeaderComponent={memo(ListHeaderComponent)}
       ListFooterComponent={memo(ListFooterComponent)}
-      onPress={handleChannelPress}
     />
   );
 };

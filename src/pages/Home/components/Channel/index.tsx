@@ -6,11 +6,14 @@ import {
   FlatList,
   StyleSheet,
   ListRenderItemInfo,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { RootState } from '@store/reducer';
 import { actions } from '@pages/Home/store';
 import { ChannelItem } from '@pages/Home/store/reducer';
+import { imageHeight } from '@pages/Home/components/Carousel';
 
 import Touchable from '@components/Touchable';
 
@@ -19,18 +22,19 @@ import Icon from '@assets/iconfont';
 interface ChannelProps {
   ListHeaderComponent: FC;
   ListFooterComponent: FC;
-  onPress: (channel: ChannelItem) => void;
 }
 
 const Channel: FC<ChannelProps> = (props) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  const { ListHeaderComponent, ListFooterComponent, onPress } = props;
+  const { ListHeaderComponent, ListFooterComponent } = props;
 
-  const { channels, pagination, channelsLoading } = useSelector(
-    (state: RootState) => state.home,
-    shallowEqual,
-  );
+  const {
+    channels,
+    pagination,
+    channelsLoading,
+    linearGradientVisible,
+  } = useSelector((state: RootState) => state.home, shallowEqual);
 
   const dispatch = useDispatch();
 
@@ -39,40 +43,38 @@ const Channel: FC<ChannelProps> = (props) => {
   ): JSX.Element => {
     const { item } = itemObj;
 
-    const handlePress = () => {
-      if (typeof onPress === 'function') {
-        onPress(item);
-      }
-    };
+    const handlePress = (): void => {};
 
     return (
-      <Touchable style={styles.itemContainer} onPress={handlePress}>
-        <Image source={{ uri: item.image }} style={styles.itemImage} />
-        <View style={styles.itemRightContainer}>
-          <View style={styles.itemRightTopContainer}>
-            <View>
-              <Text style={styles.itemTitle} numberOfLines={1}>
-                {item.title}
-              </Text>
+      <View style={styles.itemWrapper}>
+        <Touchable style={styles.itemContainer} onPress={handlePress}>
+          <Image source={{ uri: item.image }} style={styles.itemImage} />
+          <View style={styles.itemRightContainer}>
+            <View style={styles.itemRightTopContainer}>
+              <View>
+                <Text style={styles.itemTitle} numberOfLines={1}>
+                  {item.title}
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.itemRemark} numberOfLines={2}>
+                  {item.remark}
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text style={styles.itemRemark} numberOfLines={2}>
-                {item.remark}
-              </Text>
+            <View style={styles.itemRightBottomContainer}>
+              <View style={styles.itemNumberContainer}>
+                <Icon name="iconplay" size={18} />
+                <Text>{item.played}</Text>
+              </View>
+              <View style={styles.itemNumberContainer}>
+                <Icon name="iconlisting-content" size={18} />
+                <Text>{item.playing}</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.itemRightBottomContainer}>
-            <View style={styles.itemNumberContainer}>
-              <Icon name="iconplay" size={18} />
-              <Text>{item.played}</Text>
-            </View>
-            <View style={styles.itemNumberContainer}>
-              <Icon name="iconlisting-content" size={18} />
-              <Text>{item.playing}</Text>
-            </View>
-          </View>
-        </View>
-      </Touchable>
+        </Touchable>
+      </View>
     );
   };
 
@@ -98,6 +100,18 @@ const Channel: FC<ChannelProps> = (props) => {
     dispatch(actions.getChannels({ loadMore: true }));
   };
 
+  const handleScroll = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ): void => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const visible = offsetY < imageHeight;
+    if (linearGradientVisible !== visible) {
+      dispatch(
+        actions.changeLinearGradientVisible({ linearGradientVisible: visible }),
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -110,6 +124,7 @@ const Channel: FC<ChannelProps> = (props) => {
         onRefresh={handleRefresh}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.2}
+        onScroll={handleScroll}
       />
     </View>
   );
@@ -117,6 +132,9 @@ const Channel: FC<ChannelProps> = (props) => {
 
 const styles = StyleSheet.create({
   container: {},
+  itemWrapper: {
+    backgroundColor: 'rgb(242, 242, 242)',
+  },
   itemContainer: {
     flexDirection: 'row',
     padding: 10,

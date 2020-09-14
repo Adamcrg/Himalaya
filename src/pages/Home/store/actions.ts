@@ -11,9 +11,9 @@ const CAROUSEL_URL = '/mock/11/Himalaya/carousel';
 const GUESS_URL = '/mock/11/Himalaya/guess';
 const CHANNEL_URL = '/mock/11/Himalaya/channel';
 
-interface LoadingAction {
+interface ActiveCarouselIndexAction {
   type: constants;
-  payload: { loading: boolean };
+  payload: { index: number };
 }
 
 interface CarouselsAction {
@@ -31,11 +31,23 @@ interface ChannelsAction {
   payload: { channels: ChannelItem[]; pagination: Pagination };
 }
 
+interface LoadingAction {
+  type: constants;
+  payload: { loading: boolean };
+}
+
+interface ScrollAction {
+  type: constants;
+  payload: { linearGradientVisible: boolean };
+}
+
 export type HomeActionTypes =
-  | LoadingAction
   | CarouselsAction
+  | ActiveCarouselIndexAction
   | GuessesAction
-  | ChannelsAction;
+  | ChannelsAction
+  | LoadingAction
+  | ScrollAction;
 
 const getCarouselsAction = (carousels: CarouselItem[]): CarouselsAction => ({
   type: constants.GET_CAROUSELS,
@@ -55,9 +67,23 @@ const getChannelsAction = (
   payload: { channels, pagination },
 });
 
-const changeChannelsLoading = (loading: boolean): LoadingAction => ({
+const changeChannelsLoadingAction = (loading: boolean): LoadingAction => ({
   type: constants.CHANGE_CHANNELS_LOADING,
   payload: { loading },
+});
+
+const changeActiveCarouselIndexAction = (
+  index: number,
+): ActiveCarouselIndexAction => ({
+  type: constants.CHANGE_ACTIVE_CAROUSEL_INDEX,
+  payload: { index },
+});
+
+const changeLinearGradientVisibleAction = (
+  linearGradientVisible: boolean,
+): ScrollAction => ({
+  type: constants.CHANGE_LINEAR_GRADIENT_VISIBLE,
+  payload: { linearGradientVisible },
 });
 
 export const getCarousels = () => {
@@ -68,6 +94,12 @@ export const getCarousels = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+};
+
+export const changeActiveCarouselIndex = ({ index }: { index: number }) => {
+  return (dispatch) => {
+    dispatch(changeActiveCarouselIndexAction(index));
   };
 };
 
@@ -91,7 +123,7 @@ export const getChannels = ({
 }) => {
   return async (dispatch, getState) => {
     try {
-      dispatch(changeChannelsLoading(true));
+      dispatch(changeChannelsLoadingAction(true));
       const { channels, pagination } = getState().home;
       let { current } = pagination;
       if (loadMore) {
@@ -112,9 +144,19 @@ export const getChannels = ({
         }),
       );
       callback && callback();
-      dispatch(changeChannelsLoading(false));
+      dispatch(changeChannelsLoadingAction(false));
     } catch (error) {
       console.log(error);
     }
+  };
+};
+
+export const changeLinearGradientVisible = ({
+  linearGradientVisible,
+}: {
+  linearGradientVisible: boolean;
+}) => {
+  return (dispatch) => {
+    dispatch(changeLinearGradientVisibleAction(linearGradientVisible));
   };
 };

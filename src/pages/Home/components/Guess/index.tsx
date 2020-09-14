@@ -32,8 +32,10 @@ const Guess: FC<GuessProps> = (props) => {
   const renderItem = (itemObj: ListRenderItemInfo<GuessItem>): JSX.Element => {
     const { item } = itemObj;
 
+    const handlePress = (): void => {};
+
     return (
-      <Touchable style={styles.itemContainer} onPress={() => {}}>
+      <Touchable style={styles.itemContainer} onPress={handlePress}>
         <Image source={{ uri: item.image }} style={styles.itemImage} />
         <Text numberOfLines={2}>{item.title}</Text>
       </Touchable>
@@ -56,46 +58,51 @@ const Guess: FC<GuessProps> = (props) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Icon name="iconkehuquanyi" size={24} />
-          <Text style={styles.headerLeftText}>猜你喜欢</Text>
+    <View style={styles.wrapper}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Icon name="iconkehuquanyi" size={24} />
+            <Text style={styles.headerLeftText}>猜你喜欢</Text>
+          </View>
+          <View style={styles.headerRight}>
+            <Text style={styles.headerRightText}>更多</Text>
+            <Icon name="iconarrow-right" />
+          </View>
         </View>
-        <View style={styles.headerRight}>
-          <Text style={styles.headerRightText}>更多</Text>
-          <Icon name="iconarrow-right" />
-        </View>
+        <FlatList
+          style={styles.listContainer}
+          numColumns={3}
+          data={guesses}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+        />
+        <Touchable style={styles.footer} onPress={handleSwitch}>
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: rotateAnim.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ['0deg', '180deg'],
+                  }),
+                },
+              ],
+            }}
+          >
+            <Icon name="iconexchangerate" color="#f86442" />
+          </Animated.View>
+          <Text style={styles.footerText}>换一批</Text>
+        </Touchable>
       </View>
-      <FlatList
-        style={styles.listContainer}
-        numColumns={3}
-        data={guesses}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-      />
-      <Touchable style={styles.footer} onPress={handleSwitch}>
-        <Animated.View
-          style={{
-            transform: [
-              {
-                rotate: rotateAnim.interpolate({
-                  inputRange: [0, 100],
-                  outputRange: ['0deg', '180deg'],
-                }),
-              },
-            ],
-          }}
-        >
-          <Icon name="iconexchangerate" color="#f86442" />
-        </Animated.View>
-        <Text style={styles.footerText}>换一批</Text>
-      </Touchable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    backgroundColor: 'rgb(242, 242, 242)',
+  },
   container: {
     marginHorizontal: 12,
     marginVertical: 16,
@@ -107,7 +114,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 15,
     borderBottomColor: '#efefef',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: 2 * StyleSheet.hairlineWidth,
   },
   headerLeft: {
     flexDirection: 'row',
