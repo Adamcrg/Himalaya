@@ -70,8 +70,6 @@ const BottomTabs: FC<BottomTabsProps> = (props) => {
 
   return (
     <Tabs.Navigator
-      // 懒加载
-      lazy
       tabBarOptions={{
         activeTintColor: '#f86442',
       }}

@@ -18,8 +18,6 @@ const HomeTabs: FC = () => {
 
   return (
     <Tabs.Navigator
-      // 懒加载
-      lazy
       tabBar={renderTabBar}
       sceneContainerStyle={styles.sceneContainer}
       tabBarOptions={{
@@ -36,11 +34,6 @@ const HomeTabs: FC = () => {
         inactiveTintColor: '#333333',
       }}
     >
-      <Tabs.Screen
-        name="Home"
-        component={Home}
-        options={{ tabBarLabel: '首页' }}
-      />
       <Tabs.Screen
         name="Recommend"
         component={Home}

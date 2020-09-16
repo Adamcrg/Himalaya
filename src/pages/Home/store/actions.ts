@@ -6,38 +6,41 @@ import {
   ChannelItem,
   Pagination,
 } from '@pages/Home/store/reducer';
+import { Action } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+import { RootState } from '@store/reducer';
 
 const CAROUSEL_URL = '/mock/11/Himalaya/carousel';
 const GUESS_URL = '/mock/11/Himalaya/guess';
 const CHANNEL_URL = '/mock/11/Himalaya/channel';
 
 interface ActiveCarouselIndexAction {
-  type: constants;
+  type: constants.CHANGE_ACTIVE_CAROUSEL_INDEX;
   payload: { index: number };
 }
 
 interface CarouselsAction {
-  type: constants;
+  type: constants.GET_CAROUSELS;
   payload: { carousels: CarouselItem[] };
 }
 
 interface GuessesAction {
-  type: constants;
+  type: constants.GET_GUESSES;
   payload: { guesses: GuessItem[] };
 }
 
 interface ChannelsAction {
-  type: constants;
+  type: constants.GET_CHANNELS;
   payload: { channels: ChannelItem[]; pagination: Pagination };
 }
 
 interface LoadingAction {
-  type: constants;
+  type: constants.CHANGE_CHANNELS_LOADING;
   payload: { loading: boolean };
 }
 
 interface ScrollAction {
-  type: constants;
+  type: constants.CHANGE_LINEAR_GRADIENT_VISIBLE;
   payload: { linearGradientVisible: boolean };
 }
 
@@ -86,7 +89,12 @@ const changeLinearGradientVisibleAction = (
   payload: { linearGradientVisible },
 });
 
-export const getCarousels = () => {
+export const getCarousels = (): ThunkAction<
+  void,
+  RootState,
+  null,
+  Action<string>
+> => {
   return async (dispatch) => {
     try {
       const { data } = await axios.get(CAROUSEL_URL);
@@ -97,13 +105,22 @@ export const getCarousels = () => {
   };
 };
 
-export const changeActiveCarouselIndex = ({ index }: { index: number }) => {
+export const changeActiveCarouselIndex = ({
+  index,
+}: {
+  index: number;
+}): ThunkAction<void, RootState, null, Action<string>> => {
   return (dispatch) => {
     dispatch(changeActiveCarouselIndexAction(index));
   };
 };
 
-export const getGuesses = () => {
+export const getGuesses = (): ThunkAction<
+  void,
+  RootState,
+  null,
+  Action<string>
+> => {
   return async (dispatch) => {
     try {
       const { data } = await axios.get(GUESS_URL);
@@ -120,7 +137,7 @@ export const getChannels = ({
 }: {
   loadMore?: boolean;
   callback?: () => void;
-}) => {
+}): ThunkAction<void, RootState, null, Action<string>> => {
   return async (dispatch, getState) => {
     try {
       dispatch(changeChannelsLoadingAction(true));
@@ -155,7 +172,7 @@ export const changeLinearGradientVisible = ({
   linearGradientVisible,
 }: {
   linearGradientVisible: boolean;
-}) => {
+}): ThunkAction<void, RootState, null, Action<string>> => {
   return (dispatch) => {
     dispatch(changeLinearGradientVisibleAction(linearGradientVisible));
   };

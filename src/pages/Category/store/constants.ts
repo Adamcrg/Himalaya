@@ -1,0 +1,8 @@
+enum constants {
+  GET_CATEGORYS = 'GET_CATEGORYS',
+  GET_MY_CATEGORYS = 'GET_MY_CATEGORYS',
+  CHANGE_EDITING = 'CHANGE_EDITING',
+  ADD_MY_CATEGORYS = 'ADD_MY_CATEGORYS',
+}
+
+export default constants;

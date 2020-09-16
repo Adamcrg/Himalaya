@@ -15,19 +15,53 @@ import { actions } from '@pages/Home/store';
 import { ChannelItem } from '@pages/Home/store/reducer';
 import { imageHeight } from '@pages/Home/components/Carousel';
 
+import Carousel from '@pages/Home/components/Carousel';
+import Guess from '@pages/Home/components/Guess';
+
 import Touchable from '@components/Touchable';
 
 import Icon from '@assets/iconfont';
 
-interface ChannelProps {
-  ListHeaderComponent: FC;
-  ListFooterComponent: FC;
-}
+interface ChannelProps {}
+
+const ListHeaderComponent: FC = () => {
+  return (
+    <View>
+      <Carousel />
+      <Guess />
+    </View>
+  );
+};
+
+const ListFooterComponent: FC = () => {
+  const { channels, pagination, channelsLoading } = useSelector(
+    (state: RootState) => state.home,
+    shallowEqual,
+  );
+
+  const { hasMore } = pagination;
+
+  if (!hasMore) {
+    return (
+      <View style={styles.footer}>
+        <Text>--- 我是有底线的 ---</Text>
+      </View>
+    );
+  }
+
+  if (channelsLoading && hasMore && channels.length > 0) {
+    return (
+      <View style={styles.footer}>
+        <Text>正在加载中...</Text>
+      </View>
+    );
+  }
+
+  return <View />;
+};
 
 const Channel: FC<ChannelProps> = (props) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
-
-  const { ListHeaderComponent, ListFooterComponent } = props;
 
   const {
     channels,
@@ -131,6 +165,11 @@ const Channel: FC<ChannelProps> = (props) => {
 };
 
 const styles = StyleSheet.create({
+  footer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
   container: {},
   itemWrapper: {
     backgroundColor: 'rgb(242, 242, 242)',

@@ -9,10 +9,14 @@ import {
 } from '@react-navigation/stack';
 
 import BottomTabs from '@navigator/BottomTabs';
+import Categorys from '@pages/Category';
 import Detail from '@pages/Detail';
 
 export type RootStackParamList = {
-  BottomTabs: undefined;
+  BottomTabs: {
+    screen?: string;
+  };
+  Category: undefined;
   Detail: {
     id: number;
   };
@@ -33,12 +37,23 @@ const Navigator: FC = () => {
           headerStatusBarHeight: Platform.select({
             android: StatusBar.currentHeight,
           }),
+          headerBackTitleVisible: false,
+          headerTintColor: '#333333',
           headerTitleAlign: 'center',
           headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}
       >
-        <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen
+          name="BottomTabs"
+          component={BottomTabs}
+          options={{ headerTitle: '首页' }}
+        />
+        <Stack.Screen
+          name="Category"
+          component={Categorys}
+          options={{ headerTitle: '分类' }}
+        />
         <Stack.Screen
           name="Detail"
           component={Detail}

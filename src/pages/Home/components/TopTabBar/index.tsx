@@ -1,4 +1,4 @@
-import React, { FC, useRef, useEffect } from 'react';
+import React, { FC, memo, useRef, useEffect } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
 import {
   MaterialTopTabBar,
@@ -64,13 +64,21 @@ const TopTabBar: FC<TopTabBarProps> = (props) => {
     ? StyleSheet.compose(indicatorStyle, styles.lightBackgroundColor)
     : indicatorStyle;
 
+  const hansleCategoryPress = (): void => {
+    const { navigation } = props;
+
+    navigation.navigate('Category');
+  };
+
   return (
     <View style={styles.wrapper}>
       <Animated.View
-        style={{
-          ...styles.linearGradientContainer,
-          opacity: opacityAnim,
-        }}
+        style={StyleSheet.flatten([
+          styles.linearGradientContainer,
+          {
+            opacity: opacityAnim,
+          },
+        ])}
       >
         <LinearGradient style={styles.linearGradient} colors={colors} />
       </Animated.View>
@@ -82,7 +90,7 @@ const TopTabBar: FC<TopTabBarProps> = (props) => {
           inactiveTintColor={topTabBarInactiveTintColor}
           {...restProps}
         />
-        <Touchable style={styles.categoryBtn}>
+        <Touchable style={styles.categoryBtn} onPress={hansleCategoryPress}>
           <Text style={textStyle}>分类</Text>
         </Touchable>
       </View>
@@ -153,4 +161,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TopTabBar;
+export default memo(TopTabBar);
