@@ -15,10 +15,7 @@ export interface CategoryState {
 }
 
 const initialState: CategoryState = {
-  myCategorys: [
-    { id: 'home', name: '推荐' },
-    { id: 'vip', name: 'VIP' },
-  ],
+  myCategorys: [],
   categorys: [],
   editing: false,
 };
@@ -36,7 +33,7 @@ export default produce(
         const { myCategorys } = action.payload as {
           myCategorys: CategoryItem[];
         };
-        draftState.myCategorys = [...draftState.myCategorys, ...myCategorys];
+        draftState.myCategorys = myCategorys;
         return draftState;
       }
 
@@ -47,10 +44,18 @@ export default produce(
       }
 
       case constants.ADD_MY_CATEGORYS: {
-        const { newCategory } = action.payload as {
-          newCategory: CategoryItem;
+        const { myCategorys } = action.payload as {
+          myCategorys: CategoryItem[];
         };
-        draftState.myCategorys = [...draftState.myCategorys, newCategory];
+        draftState.myCategorys = myCategorys;
+        return draftState;
+      }
+
+      case constants.DELETE_MY_CATEGORYS: {
+        const { myCategorys } = action.payload as {
+          myCategorys: CategoryItem[];
+        };
+        draftState.myCategorys = myCategorys;
         return draftState;
       }
 

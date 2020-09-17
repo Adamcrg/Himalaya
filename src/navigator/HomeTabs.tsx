@@ -12,7 +12,7 @@ import Home from '@pages/Home';
 const Tabs = createMaterialTopTabNavigator();
 
 const HomeTabs: FC = () => {
-  const renderTabBar = (props: MaterialTopTabBarProps): JSX.Element => {
+  const renderTabBar = (props: MaterialTopTabBarProps): JSX.Element | null => {
     return <TopTabBar {...props} />;
   };
 

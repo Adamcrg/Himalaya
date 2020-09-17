@@ -29,7 +29,9 @@ const Guess: FC<GuessProps> = (props) => {
 
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
-  const renderItem = (itemObj: ListRenderItemInfo<GuessItem>): JSX.Element => {
+  const renderItem = (
+    itemObj: ListRenderItemInfo<GuessItem>,
+  ): JSX.Element | null => {
     const { item } = itemObj;
 
     const handlePress = (): void => {};

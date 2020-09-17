@@ -14,7 +14,10 @@ storage.sync.categorys = async () => {
 };
 
 storage.sync.myCategorys = async () => {
-  return [];
+  return [
+    { id: 'home', name: '推荐' },
+    { id: 'vip', name: 'VIP' },
+  ];
 };
 
 interface CategorysAction {
@@ -23,7 +26,10 @@ interface CategorysAction {
 }
 
 interface MyCategorysAction {
-  type: constants.GET_MY_CATEGORYS;
+  type:
+    | constants.GET_MY_CATEGORYS
+    | constants.ADD_MY_CATEGORYS
+    | constants.DELETE_MY_CATEGORYS;
   payload: { myCategorys: CategoryItem[] };
 }
 
@@ -32,16 +38,10 @@ interface EditingAction {
   payload: { editing: boolean };
 }
 
-interface AddMyCategorysAction {
-  type: constants.ADD_MY_CATEGORYS;
-  payload: { newCategory: CategoryItem };
-}
-
 export type CategoryActionTypes =
   | CategorysAction
   | MyCategorysAction
-  | EditingAction
-  | AddMyCategorysAction;
+  | EditingAction;
 
 const getCategorysAction = (categorys: CategoryItem[]): CategorysAction => ({
   type: constants.GET_CATEGORYS,
@@ -61,10 +61,17 @@ const changeEditingAction = (editing: boolean): EditingAction => ({
 });
 
 const addMyCategoryAction = (
-  newCategory: CategoryItem,
-): AddMyCategorysAction => ({
+  myCategorys: CategoryItem[],
+): MyCategorysAction => ({
   type: constants.ADD_MY_CATEGORYS,
-  payload: { newCategory },
+  payload: { myCategorys },
+});
+
+const deleteMyCategoryAction = (
+  myCategorys: CategoryItem[],
+): MyCategorysAction => ({
+  type: constants.DELETE_MY_CATEGORYS,
+  payload: { myCategorys },
 });
 
 export const getAllCategorys = (): ThunkAction<
@@ -77,9 +84,7 @@ export const getAllCategorys = (): ThunkAction<
     try {
       const categorys = await storage.load({ key: 'categorys' });
       const myCategorys = await storage.load({ key: 'myCategorys' });
-      if (myCategorys) {
-        dispatch(getMyCategorysAction(myCategorys));
-      }
+      dispatch(getMyCategorysAction(myCategorys));
       dispatch(getCategorysAction(categorys));
     } catch (error) {
       console.log(error);
@@ -87,24 +92,43 @@ export const getAllCategorys = (): ThunkAction<
   };
 };
 
-export const changeEditing = (): ThunkAction<
-  void,
-  RootState,
-  null,
-  Action<string>
-> => {
+export const changeEditing = ({
+  editing,
+}: {
+  editing: boolean;
+}): ThunkAction<void, RootState, null, Action<string>> => {
   return (dispatch, getState) => {
-    const { editing } = getState().category;
-    dispatch(changeEditingAction(!editing));
+    const { myCategorys } = getState().category;
+    dispatch(changeEditingAction(editing));
+    if (!editing) {
+      storage.save({
+        key: 'myCategorys',
+        data: myCategorys,
+      });
+    }
   };
 };
 
 export const addMyCategory = ({
-  newCategory,
+  addItem,
 }: {
-  newCategory: CategoryItem;
+  addItem: CategoryItem;
 }): ThunkAction<void, RootState, null, Action<string>> => {
-  return (dispatch) => {
-    dispatch(addMyCategoryAction(newCategory));
+  return (dispatch, getState) => {
+    const { myCategorys } = getState().category;
+    const newArr = [...myCategorys, addItem];
+    dispatch(addMyCategoryAction(newArr));
+  };
+};
+
+export const deleteMyCategory = ({
+  deleteItem,
+}: {
+  deleteItem: CategoryItem;
+}): ThunkAction<void, RootState, null, Action<string>> => {
+  return (dispatch, getState) => {
+    const { myCategorys } = getState().category;
+    const newArr = myCategorys.filter((item) => item.id !== deleteItem.id);
+    dispatch(deleteMyCategoryAction(newArr));
   };
 };

@@ -10,6 +10,8 @@ import { CategoryItem as CategoryItemType } from '@pages/Category/store/reducer'
 import CategoryItem from '@pages/Category/CategoryItem';
 import HeaderButton from '@pages/Category/HeaderButton';
 
+const excludeItemId = ['home', 'vip'];
+
 interface CategoryProps {
   navigation: RootStackNavigation;
 }
@@ -29,18 +31,27 @@ const Categorys: FC<CategoryProps> = (props) => {
     });
     dispatch(actions.getAllCategorys());
     return () => {
-      dispatch(actions.changeEditing());
+      dispatch(actions.changeEditing({ editing: false }));
     };
   }, [navigation, dispatch]);
 
-  const renderItem = (item: CategoryItemType, index: number): JSX.Element => {
-    return <CategoryItem key={item.id} data={item} selected />;
+  const renderItem = (
+    item: CategoryItemType,
+    index: number,
+  ): JSX.Element | null => {
+    const disabled = excludeItemId.includes(item.id);
+    return (
+      <CategoryItem key={item.id} data={item} selected disabled={disabled} />
+    );
   };
 
   const renderUnselectedItem = (
     item: CategoryItemType,
     index: number,
-  ): JSX.Element => {
+  ): JSX.Element | null => {
+    if (myCategorys.find((itemObj) => itemObj.id === item.id)) {
+      return null;
+    }
     return <CategoryItem key={item.id} data={item} selected={false} />;
   };
 
@@ -55,14 +66,17 @@ const Categorys: FC<CategoryProps> = (props) => {
         </View>
       </View>
       <View style={styles.classifyWrapper}>
-        {Object.keys(classifyGroup).map((classify) => (
-          <View key={classify}>
-            <Text style={styles.classifyTitle}>{classify}</Text>
-            <View style={styles.classifyContainer}>
-              {classifyGroup[classify].map(renderUnselectedItem)}
-            </View>
-          </View>
-        ))}
+        {Object.keys(classifyGroup).map(
+          (classify) =>
+            classifyGroup[classify].length && (
+              <View key={classify}>
+                <Text style={styles.classifyTitle}>{classify}</Text>
+                <View style={styles.classifyContainer}>
+                  {classifyGroup[classify].map(renderUnselectedItem)}
+                </View>
+              </View>
+            ),
+        )}
       </View>
     </ScrollView>
   );

@@ -10,7 +10,7 @@ const HeaderButton: FC = () => {
   const dispatch = useDispatch();
 
   const handleBtnPress = (): void => {
-    dispatch(actions.changeEditing());
+    dispatch(actions.changeEditing({ editing: !editing }));
   };
 
   return (

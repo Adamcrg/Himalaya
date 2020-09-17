@@ -28,7 +28,7 @@ const Carousel: FC<CarouselProps> = (props) => {
   const renderItem = (
     itemObj: ListRenderItemInfo<CarouselItem>,
     parallaxProps?: AdditionalParallaxProps,
-  ): JSX.Element => {
+  ): JSX.Element | null => {
     const { item } = itemObj;
 
     return (
@@ -49,7 +49,7 @@ const Carousel: FC<CarouselProps> = (props) => {
     dispatch(actions.changeActiveCarouselIndex({ index }));
   };
 
-  const pagination = (): JSX.Element => {
+  const pagination = (): JSX.Element | null => {
     return (
       <View style={styles.paginationWrapper}>
         <Pagination

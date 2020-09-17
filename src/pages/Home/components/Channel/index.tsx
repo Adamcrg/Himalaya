@@ -74,7 +74,7 @@ const Channel: FC<ChannelProps> = (props) => {
 
   const renderItem = (
     itemObj: ListRenderItemInfo<ChannelItem>,
-  ): JSX.Element => {
+  ): JSX.Element | null => {
     const { item } = itemObj;
 
     const handlePress = (): void => {};

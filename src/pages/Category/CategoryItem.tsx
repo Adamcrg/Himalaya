@@ -15,23 +15,30 @@ const classifyItemContainerWidth = (viewportWidth - 20) / 4;
 interface CategoryItemProps {
   data: CategoryItemType;
   selected: boolean;
+  disabled?: boolean;
 }
 
 const CategoryItem: FC<CategoryItemProps> = (props) => {
-  const { data, selected } = props;
+  const { data, selected, disabled } = props;
 
   const { editing } = useSelector((state: RootState) => state.category);
 
   const dispatch = useDispatch();
 
   const handleItemPress = (): void => {
-    if (editing && !selected) {
-      dispatch(actions.addMyCategory({ newCategory: data }));
+    if (!disabled) {
+      if (editing) {
+        if (selected) {
+          dispatch(actions.deleteMyCategory({ deleteItem: data }));
+        } else {
+          dispatch(actions.addMyCategory({ addItem: data }));
+        }
+      }
     }
   };
 
   const handleItemLongPress = (): void => {
-    dispatch(actions.changeEditing());
+    dispatch(actions.changeEditing({ editing: true }));
   };
 
   return (
@@ -40,7 +47,7 @@ const CategoryItem: FC<CategoryItemProps> = (props) => {
       onPress={handleItemPress}
       onLongPress={handleItemLongPress}
     >
-      {editing && (
+      {editing && !disabled && (
         <View style={styles.classifyIconContianer}>
           <Icon
             name={selected ? 'iconsami-select' : 'iconadd-select'}
