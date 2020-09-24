@@ -1,101 +1,206 @@
-import React, { FC, memo, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import groupBy from 'lodash/groupBy';
-import { RootStackNavigation } from '@navigator';
-import { RootState } from '@store/reducer';
-import { actions } from '@pages/Category/store';
-import { CategoryItem as CategoryItemType } from '@pages/Category/store/reducer';
+import React from 'react';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import _ from 'lodash';
+import {DragSortableView} from 'react-native-drag-sort';
+import {RootState} from '@/models/index';
+import {connect, ConnectedProps} from 'react-redux';
+import {ICategory} from '@/models/category';
+import Item, {parentWidth, itemWidth, itemHeight, margin} from './Item';
+import {RootStackNavigation} from '@/navigator/index';
+import HeaderRightBtn from './HeaderRightBtn';
+import Touchable from '@/components/Touchable';
 
-import CategoryItem from '@pages/Category/CategoryItem';
-import HeaderButton from '@pages/Category/HeaderButton';
+const mapStateToProps = ({category}: RootState) => {
+  return {
+    myCategorys: category.myCategorys,
+    categorys: category.categorys,
+    isEdit: category.isEdit,
+  };
+};
 
-const excludeItemId = ['home', 'vip'];
+const connector = connect(mapStateToProps);
 
-interface CategoryProps {
+type ModelState = ConnectedProps<typeof connector>;
+
+interface IProps extends ModelState {
   navigation: RootStackNavigation;
 }
 
-const Categorys: FC<CategoryProps> = (props) => {
-  const { navigation } = props;
+interface IState {
+  myCategorys: ICategory[];
+  scrollEnabled: boolean;
+}
 
-  const { myCategorys, categorys } = useSelector(
-    (state: RootState) => state.category,
-  );
+const fixedItems = [0, 1];
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => <HeaderButton />,
+class Category extends React.Component<IProps, IState> {
+  state = {
+    myCategorys: this.props.myCategorys,
+    scrollEnabled: true,
+  };
+  constructor(props: IProps) {
+    super(props);
+    props.navigation.setOptions({
+      headerRight: () => <HeaderRightBtn onSubmit={this.onSubmit} />,
     });
-    dispatch(actions.getAllCategorys());
-    return () => {
-      dispatch(actions.changeEditing({ editing: false }));
-    };
-  }, [navigation, dispatch]);
+  }
+  componentWillUnmount() {
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'category/setState',
+      payload: {
+        isEdit: false,
+      },
+    });
+  }
+  onSubmit = () => {
+    const {dispatch, navigation, isEdit} = this.props;
+    const {myCategorys} = this.state;
+    dispatch({
+      type: 'category/toggle',
+      payload: {
+        myCategorys,
+      },
+    });
+    if (isEdit) {
+      navigation.goBack();
+    }
+  };
+  onLongPress = () => {
+    const {dispatch} = this.props;
+    dispatch({
+      type: 'category/setState',
+      payload: {
+        isEdit: true,
+      },
+    });
+  };
+  onPress = (item: ICategory, index: number, selected: boolean) => {
+    const {isEdit} = this.props;
+    const {myCategorys} = this.state;
+    const disabled = fixedItems.indexOf(index) > -1;
+    if (disabled) return;
+    if (isEdit) {
+      if (selected) {
+        this.setState({
+          myCategorys: myCategorys.filter(
+            selectedItem => selectedItem.id !== item.id,
+          ),
+        });
+      } else {
+        this.setState({
+          myCategorys: myCategorys.concat([item]),
+        });
+      }
+    }
+  };
+  onClickItem = (data: ICategory[], item: ICategory) => {
+    this.onPress(item, data.indexOf(item), true);
+  };
+  onDataChange = (data: ICategory[]) => {
+    this.setState({
+      myCategorys: data,
+    });
+  };
 
-  const renderItem = (
-    item: CategoryItemType,
-    index: number,
-  ): JSX.Element | null => {
-    const disabled = excludeItemId.includes(item.id);
+  renderItem = (item: ICategory, index: number) => {
+    const {isEdit} = this.props;
+    const disabled = fixedItems.indexOf(index) > -1;
     return (
-      <CategoryItem key={item.id} data={item} selected disabled={disabled} />
+      <Item
+        key={item.id}
+        data={item}
+        disabled={disabled}
+        isEdit={isEdit}
+        selected
+      />
     );
   };
-
-  const renderUnselectedItem = (
-    item: CategoryItemType,
-    index: number,
-  ): JSX.Element | null => {
-    if (myCategorys.find((itemObj) => itemObj.id === item.id)) {
-      return null;
-    }
-    return <CategoryItem key={item.id} data={item} selected={false} />;
+  renderUnSelectedItem = (item: ICategory, index: number) => {
+    const {isEdit} = this.props;
+    return (
+      <Touchable
+        key={item.id}
+        onPress={() => this.onPress(item, index, false)}
+        onLongPress={this.onLongPress}>
+        <Item data={item} isEdit={isEdit} selected={false} />
+      </Touchable>
+    );
   };
-
-  const classifyGroup = groupBy(categorys, (item) => item.classify);
-
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.classifyWrapper}>
-        <Text style={styles.classifyTitle}>我的分类</Text>
-        <View style={styles.classifyContainer}>
-          {myCategorys.map(renderItem)}
+  render() {
+    const {categorys, isEdit} = this.props;
+    const {myCategorys, scrollEnabled} = this.state;
+    const clasifyGroup = _.groupBy(categorys, item => item.classify);
+    return (
+      <ScrollView style={styles.container} scrollEnabled={scrollEnabled}>
+        <Text style={styles.classifyName}>我的分类</Text>
+        <View style={styles.classifyView}>
+          <DragSortableView
+            dataSource={myCategorys}
+            fixedItems={fixedItems}
+            renderItem={this.renderItem}
+            sortable={isEdit}
+            keyExtractor={item => item.id}
+            onDataChange={this.onDataChange}
+            parentWidth={parentWidth}
+            childrenWidth={itemWidth}
+            childrenHeight={itemHeight}
+            marginChildrenTop={margin}
+            onClickItem={this.onClickItem}
+            onDragStart={() => {
+              this.setState({
+                scrollEnabled: false,
+              });
+            }}
+            onDragEnd={() => {
+              this.setState({
+                scrollEnabled: true,
+              });
+            }}
+          />
         </View>
-      </View>
-      <View style={styles.classifyWrapper}>
-        {Object.keys(classifyGroup).map(
-          (classify) =>
-            classifyGroup[classify].length && (
+        <View>
+          {Object.keys(clasifyGroup).map(classify => {
+            return (
               <View key={classify}>
-                <Text style={styles.classifyTitle}>{classify}</Text>
-                <View style={styles.classifyContainer}>
-                  {classifyGroup[classify].map(renderUnselectedItem)}
+                <Text style={styles.classifyName}>{classify}</Text>
+                <View style={styles.classifyView}>
+                  {clasifyGroup[classify].map((item, index) => {
+                    if (
+                      myCategorys.find(
+                        selectedItem => selectedItem.id === item.id,
+                      )
+                    ) {
+                      return null;
+                    }
+                    return this.renderUnSelectedItem(item, index);
+                  })}
                 </View>
               </View>
-            ),
-        )}
-      </View>
-    </ScrollView>
-  );
-};
+            );
+          })}
+        </View>
+      </ScrollView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#f3f6f6',
   },
-  classifyWrapper: { paddingHorizontal: 10 },
-  classifyTitle: {
+  classifyName: {
     fontSize: 16,
     marginTop: 14,
     marginBottom: 8,
+    marginLeft: 10,
   },
-  classifyContainer: {
+  classifyView: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    padding: 5,
   },
 });
 
-export default memo(Categorys);
+export default connector(Category);

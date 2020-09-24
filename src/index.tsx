@@ -1,22 +1,27 @@
 import React from 'react';
-import store from '@store';
-import { Provider } from 'react-redux';
-import { StatusBar } from 'react-native';
-import '@config/axios';
+import {Provider} from 'react-redux';
+import Navigator from '@/navigator/index';
+import store from '@/config/dva';
+import {StatusBar} from 'react-native';
+import {RootSiblingParent} from 'react-native-root-siblings';
+import '@/config/http';
+import {enableScreens} from 'react-native-screens';
 
-import Navigator from '@navigator';
+enableScreens();
 
-const App = () => {
-  return (
-    <Provider store={store}>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="dark-content"
-      />
-      <Navigator />
-    </Provider>
-  );
-};
-
-export default App;
+export default class extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <RootSiblingParent>
+          <Navigator />
+        </RootSiblingParent>
+        <StatusBar
+          backgroundColor="transparent"
+          barStyle="dark-content"
+          translucent
+        />
+      </Provider>
+    );
+  }
+}
